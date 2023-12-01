@@ -21,7 +21,7 @@ int main() {
     struct sockaddr_in server_address;
     char buffer[BUFFER_SIZE];
 
-    // Windows için soket baþlatma
+    // Initialize socket for Windows
     #ifdef _WIN32
     WSADATA wsa_data;
     if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0) {
@@ -30,36 +30,36 @@ int main() {
     }
     #endif
 
-    // Socket oluþturma
+    // Create socket
     if ((client_socket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
         perror("Socket creation failed");
         exit(EXIT_FAILURE);
     }
 
-    // Server adresi ayarlama
+    // Set server address
     server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = inet_addr("127.0.0.1");  // Server'ýn IP adresi
+    server_address.sin_addr.s_addr = inet_addr("127.0.0.1");  // Server's IP address
     server_address.sin_port = htons(PORT);
 
-    // Server'a baðlanma
+    // Connect to the server
     if (connect(client_socket, (struct sockaddr*)&server_address, sizeof(server_address)) == SOCKET_ERROR) {
         perror("Connection failed");
         exit(EXIT_FAILURE);
     }
 
-    printf("Connected to server\n");
+    printf("Connected to the server\n");
 
-    // Kullanýcýdan giriþ alýp server'a gönderme
-    printf("Enter message for server: ");
+    // Receive input from the user and send it to the server
+    printf("Enter a message for the server: ");
     fgets(buffer, sizeof(buffer), stdin);
     send(client_socket, buffer, strlen(buffer), 0);
 
-    // Server'dan gelen cevabý alma
+    // Receive the response from the server
     int bytesRead = recv(client_socket, buffer, sizeof(buffer), 0);
     buffer[bytesRead] = '\0';
-    printf("Received from server: %s", buffer);
+    printf("Received from the server: %s", buffer);
 
-    // Soketi kapatma
+    // Close the socket
     #ifdef _WIN32
     closesocket(client_socket);
     WSACleanup();
@@ -69,4 +69,3 @@ int main() {
 
     return 0;
 }
-
