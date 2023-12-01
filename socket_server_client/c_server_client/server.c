@@ -22,7 +22,7 @@ int main() {
     socklen_t client_address_len = sizeof(client_address);
     char buffer[BUFFER_SIZE];
 
-    // Windows için soket baþlatma
+    // Initialize socket for Windows
     #ifdef _WIN32
     WSADATA wsa_data;
     if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0) {
@@ -31,24 +31,24 @@ int main() {
     }
     #endif
 
-    // Socket oluþturma
+    // Create socket
     if ((server_socket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
         perror("Socket creation failed");
         exit(EXIT_FAILURE);
     }
 
-    // Server adresi ayarlama
+    // Set server address
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr = INADDR_ANY;
     server_address.sin_port = htons(PORT);
 
-    // Socket'i baðlama
+    // Bind the socket
     if (bind(server_socket, (struct sockaddr*)&server_address, sizeof(server_address)) == SOCKET_ERROR) {
         perror("Binding failed");
         exit(EXIT_FAILURE);
     }
 
-    // Listen modu baþlatma
+    // Start listening mode
     if (listen(server_socket, 5) == SOCKET_ERROR) {
         perror("Listen failed");
         exit(EXIT_FAILURE);
@@ -56,7 +56,7 @@ int main() {
 
     printf("Server listening on port %d...\n", PORT);
 
-    // Baðlantý bekleniyor
+    // Waiting for connection
     if ((client_socket = accept(server_socket, (struct sockaddr*)&client_address, &client_address_len)) == INVALID_SOCKET) {
         perror("Accept failed");
         exit(EXIT_FAILURE);
@@ -64,15 +64,15 @@ int main() {
 
     printf("Client connected: %s\n", inet_ntoa(client_address.sin_addr));
 
-    // Client'tan gelen veriyi okuma
+    // Read data from the client
     int bytesRead;
     while ((bytesRead = recv(client_socket, buffer, sizeof(buffer), 0)) > 0) {
         buffer[bytesRead] = '\0';
         printf("Received from client: %s", buffer);
-        send(client_socket, buffer, bytesRead, 0);  // Client'a geri gönderme
+        send(client_socket, buffer, bytesRead, 0);  // Send back to the client
     }
 
-    // Soketleri kapatma
+    // Close the sockets
     #ifdef _WIN32
     closesocket(client_socket);
     closesocket(server_socket);
@@ -84,4 +84,3 @@ int main() {
 
     return 0;
 }
-
